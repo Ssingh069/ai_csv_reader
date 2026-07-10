@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.DS_Store
+*.log
+.vscode
+
+# local planning doc — not for the public repo
+COMMIT_PLAN.md
