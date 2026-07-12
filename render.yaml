@@ -1,20 +1,25 @@
-# Render blueprint — deploys the GrowEasy CSV Importer backend as a Docker web service.
+# Render blueprint — deploys the GrowEasy CSV Importer backend as a native Node service.
 # Connect this repo at https://dashboard.render.com/blueprints and Render reads this file.
 # Secrets (sync: false) are entered once in the Render dashboard — never commit them.
+#
+# We build natively (not via Docker): the backend is plain Node ESM, so rootDir +
+# npm ci + node start is simpler and more reliable than Docker path resolution.
 services:
   - type: web
     name: groweasy-csv-backend
-    runtime: docker
+    runtime: node
     plan: free
-    # Backend lives in a subdirectory. rootDir makes Render cd into backend/
-    # before building, so the Dockerfile and its COPY paths resolve correctly.
+    # Backend lives in a subdirectory — build and run from there.
     rootDir: backend
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    buildCommand: npm ci --omit=dev
+    startCommand: node src/index.js
     # /api/v1/health returns 200 with no external deps — safe health probe.
     healthCheckPath: /api/v1/health
     autoDeploy: true
     envVars:
+      # package.json requires Node >=20; pin it so Render doesn't drift.
+      - key: NODE_VERSION
+        value: "20"
       - key: NODE_ENV
         value: production
       # Render injects PORT automatically; env.js reads process.env.PORT.
