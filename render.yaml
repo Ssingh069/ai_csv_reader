@@ -6,8 +6,11 @@ services:
     name: groweasy-csv-backend
     runtime: docker
     plan: free
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    # Backend lives in a subdirectory. rootDir makes Render cd into backend/
+    # before building, so the Dockerfile and its COPY paths resolve correctly.
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     # /api/v1/health returns 200 with no external deps — safe health probe.
     healthCheckPath: /api/v1/health
     autoDeploy: true
