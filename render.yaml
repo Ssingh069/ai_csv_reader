@@ -6,7 +6,7 @@
 # npm ci + node start is simpler and more reliable than Docker path resolution.
 services:
   - type: web
-    name: groweasy-csv-saurabh
+    name: groweasy-csv-backend
     runtime: node
     plan: free
     # Backend lives in a subdirectory — build and run from there.
