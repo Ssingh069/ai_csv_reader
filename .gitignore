@@ -7,3 +7,10 @@ coverage
 
 # local planning doc — not for the public repo
 COMMIT_PLAN.md
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
