@@ -1,8 +1,8 @@
-# GrowEasy — AI CSV Importer
+# GrowEasy — CSV Importer
 
-Upload a messy CSV of leads, let an LLM normalize and extract structured
-contact data, preview the results in a fast virtualized table, and persist
-each import to MongoDB with a browsable history.
+Upload a messy CSV of leads, normalize and extract structured contact data,
+preview the results in a fast virtualized table, and persist each import to
+MongoDB with a browsable history.
 
 The app handles the real-world mess of exported lead lists — inconsistent
 column names, multiple emails/phones in one cell, missing fields — and turns
@@ -13,15 +13,16 @@ them into clean, structured records.
 ## Features
 
 - **Drag-and-drop CSV upload** with client-side preview (PapaParse).
-- **AI-powered extraction** — normalizes columns and pulls out structured
-  fields (name, email, phone, company, etc.) using **Gemini** or **OpenAI**.
+- **Smart extraction** — normalizes columns and pulls out structured fields
+  (name, email, phone, company, etc.) using a pluggable provider (**Gemini**
+  or **OpenAI**).
 - **Virtualized results table** (`@tanstack/react-virtual`) that stays smooth
   on thousands of rows.
 - **Import history** — every run is saved to MongoDB and reopenable from the
   history drawer.
 - **Batched, concurrent extraction** with retries and timeouts, tunable via env.
 - **Graceful degradation** — runs stateless if no MongoDB is configured, and
-  ships a `mock` AI provider so it works with no API key.
+  ships a `mock` provider so it works with no API key.
 
 ---
 
@@ -31,7 +32,7 @@ them into clean, structured records.
 |-------|------|
 | Frontend | React 18, Vite, React Router, Framer Motion, TanStack Virtual, PapaParse, Lucide |
 | Backend | Node.js, Express, Multer, Zod, `p-limit`, Helmet, Morgan |
-| AI | Google Gemini / OpenAI (pluggable, plus a built-in `mock`) |
+| Extraction | Google Gemini / OpenAI (pluggable, plus a built-in `mock`) |
 | Database | MongoDB (Atlas or local — optional) |
 | Infra | Docker, docker-compose, Render (`render.yaml`) |
 
@@ -45,7 +46,7 @@ them into clean, structured records.
 │   └── src/
 │       ├── routes/     # /api/v1/{health,imports}
 │       ├── controllers/
-│       ├── services/   # AI providers + mongo
+│       ├── services/   # extraction providers + mongo
 │       └── config/     # env validation (zod)
 ├── frontend/           # Vite + React SPA
 ├── samples/            # example CSVs to try
@@ -59,7 +60,7 @@ them into clean, structured records.
 
 ### Prerequisites
 - Node.js 20+
-- A Gemini API key ([free from Google AI Studio](https://aistudio.google.com/apikey)) — or set `AI_PROVIDER=mock` to skip it
+- A Gemini API key ([free key from Google](https://aistudio.google.com/apikey)) — or set `AI_PROVIDER=mock` to skip it
 - MongoDB (optional — [Atlas](https://cloud.mongodb.com) free tier or local). Omit to run stateless.
 
 ### 1. Backend
@@ -95,7 +96,7 @@ Backend env vars (see [`backend/.env.example`](backend/.env.example)):
 | `GEMINI_API_KEY` | — | required when provider is `gemini` |
 | `GEMINI_MODEL` | `gemini-3.1-flash-lite` | Gemini model |
 | `OPENAI_API_KEY` / `OPENAI_MODEL` | — / `gpt-4o-mini` | for the OpenAI provider |
-| `BATCH_SIZE` | `20` | rows per AI batch |
+| `BATCH_SIZE` | `20` | rows per extraction batch |
 | `AI_CONCURRENCY` | `3` | parallel batches |
 | `MAX_UPLOAD_MB` | `10` | upload size limit |
 | `MONGODB_URI` | — | leave blank to run stateless |
@@ -116,7 +117,7 @@ Base path: `/api/v1`
 |--------|----------|-------------|
 | `GET`  | `/health` | Service status, provider, persistence state |
 | `POST` | `/imports/parse` | Upload a CSV (`multipart/form-data`, field `file`); returns parsed rows + `importId` |
-| `POST` | `/imports/:importId/extract` | Run AI extraction on a parsed import |
+| `POST` | `/imports/:importId/extract` | Run extraction on a parsed import |
 | `GET`  | `/imports/history` | List past imports |
 | `GET`  | `/imports/history/:importId` | Fetch a single import's details |
 
