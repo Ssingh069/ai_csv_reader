@@ -1,0 +1,14 @@
+{
+  // Cloudflare Worker that serves the built frontend as static assets.
+  // IMPORTANT: assets.directory is "dist" (the Vite build output), NOT the
+  // source folder. Cloudflare must run `npm install && npm run build` first.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "csvreader",
+  "compatibility_date": "2026-07-12",
+  "assets": {
+    "directory": "dist",
+    // React Router uses client-side routing — serve index.html for unknown
+    // paths so deep links / refreshes don't 404.
+    "not_found_handling": "single-page-application"
+  }
+}
